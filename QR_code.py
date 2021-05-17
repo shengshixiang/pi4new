@@ -3,6 +3,12 @@ import pyzbar.pyzbar as pyzbar
 import time
 import _thread
 Led_status=0
+def init():
+    file = open("/sys/bus/platform/devices/leds/leds/led0/trigger",'w')
+    file.write("none")
+    file.flush()
+    file.close()
+
 #'/home/pi/.local/lib/python3.7/site-packages/pyzbar/pyzbar.py'
 def decodeDisplay(image):
     barcodeData=""
@@ -37,26 +43,33 @@ def write_eeprom():
     
 def leds_on():
     print(leds_on)
-    
-    
+    file = open("/sys/bus/platform/devices/leds/leds/led0/brightness",'w')
+    file.write("1")
+    file.flush()
+    file.close()
 def leds_off():
     print(leds_off)   
-    
+    file = open("/sys/bus/platform/devices/leds/leds/led0/brightness",'w')
+    file.write("0")
+    file.flush()
+    file.close()
     
 def leds_blink():
-    print(leds_blink)  
-
-    
+    print(leds_blink)
+    leds_on()
+    time.sleep(0.2)
+    leds_off()
+    time.sleep(0.2)   
 def led_control_function(threadName, delay):
     global Led_status
     while(1):
         time.sleep(delay) 
         if(Led_status==1): #led on
-            print("Led-on")
+            leds_on()
         elif(Led_status==0): #led off   
-            print("led off")  
+            leds_off() 
         elif(Led_status==2): #led blink 
-            print("led blink")     
+            leds_blink()   
 def detect():
     global Led_status
     camera = cv2.VideoCapture(0)
@@ -89,6 +102,7 @@ def detect():
     camera.release()
     cv2.destroyAllWindows()
 if __name__ == '__main__':
+    init()
     try:
         _thread.start_new_thread(led_control_function, ("Thread-led-control", 0.5, ))
     except:
