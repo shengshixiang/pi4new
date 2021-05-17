@@ -1,6 +1,8 @@
 import cv2
 import pyzbar.pyzbar as pyzbar
 import time
+import _thread
+Led_status=0
 #'/home/pi/.local/lib/python3.7/site-packages/pyzbar/pyzbar.py'
 def decodeDisplay(image):
     barcodeData=""
@@ -31,10 +33,32 @@ def decodeDisplay(image):
  
 def write_eeprom():
     print(write_eeprom)
-def led_control(led_on_off):
-    print("led_on_off:")
-    print(led_on_off)
+    
+    
+def leds_on():
+    print(leds_on)
+    
+    
+def leds_off():
+    print(leds_off)   
+    
+    
+def leds_blink():
+    print(leds_blink)  
+
+    
+def led_control_function(threadName, delay):
+    global Led_status
+    while(1):
+        time.sleep(delay) 
+        if(Led_status==1): #led on
+            print("Led-on")
+        elif(Led_status==0): #led off   
+            print("led off")  
+        elif(Led_status==2): #led blink 
+            print("led blink")     
 def detect():
+    global Led_status
     camera = cv2.VideoCapture(0)
     #ret=camera.set(3,320) 
     #ret=camera.set(4,240) 
@@ -50,22 +74,30 @@ def detect():
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         except:
             camera = cv2.VideoCapture(0)
-            time.sleep(1)           
+            Led_status=0
+            time.sleep(1)     
         else:       
             im,barcodeData,ret=decodeDisplay(gray)
+            Led_status=2
             cv2.waitKey(5)#delay 5ms
             cv2.imshow("camera",im)
             if(ret == 1):
+                Led_status=1
                 eeprom_value=barcodeData[-36:]
                 print(eeprom_value)
                 break
     camera.release()
     cv2.destroyAllWindows()
 if __name__ == '__main__':
+    try:
+        _thread.start_new_thread(led_control_function, ("Thread-led-control", 0.5, ))
+    except:
+        print("Error: 无法启动线程")
+        exit
     #设置led为长灭
-    led_control(0)
     #检测和等待识别出设备
     detect()
+    time.sleep(3)  
     #识别成功，设置led为常亮
-    led_control(1)
+   
     
