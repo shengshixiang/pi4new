@@ -42,20 +42,20 @@ def write_eeprom():
     
     
 def leds_on():
-    print(leds_on)
+#    print(leds_on)
     file = open("/sys/bus/platform/devices/leds/leds/led0/brightness",'w')
     file.write("1")
     file.flush()
     file.close()
 def leds_off():
-    print(leds_off)   
+#    print(leds_off)   
     file = open("/sys/bus/platform/devices/leds/leds/led0/brightness",'w')
     file.write("0")
     file.flush()
     file.close()
     
 def leds_blink():
-    print(leds_blink)
+#    print(leds_blink)
     leds_on()
     time.sleep(0.2)
     leds_off()
@@ -86,6 +86,7 @@ def detect():
         try: 
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         except:
+            camera.release()
             camera = cv2.VideoCapture(0)
             Led_status=0
             time.sleep(1)     
@@ -99,7 +100,9 @@ def detect():
                 eeprom_value=barcodeData[-36:]
                 print(eeprom_value)
                 break
+             
     camera.release()
+    cv2.waitKey(0)
     cv2.destroyAllWindows()
 if __name__ == '__main__':
     init()
@@ -111,7 +114,8 @@ if __name__ == '__main__':
     #设置led为长灭
     #检测和等待识别出设备
     detect()
-    time.sleep(3)  
+   # time.sleep(1)
+        
     #识别成功，设置led为常亮
    
     
