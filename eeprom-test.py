@@ -13,7 +13,7 @@ import operator
 import time
 address = 0x50
 bus = smbus2.SMBus(1)
-string_device_id="700ac82b-4366-11eb-a3f8-00163e123f5"
+string_device_id="700ac82b-4366-11eb-a3f8-00163e123ff5"
 #string_device_id= "222222222222222222222222222222222222"
 def string_division_lists(string):
     device_id_list=list(string)
@@ -50,15 +50,13 @@ def verify_eeprom(string_device_id):
     for i in range(0,36):
         data=bus.read_byte(address)
         read_data_list.append(chr(data))
-        print('%#x'%data)
-    
-   
-   
+       # print('%#x'%data)
     #compare data
-    print(operator.eq(device_id_list,read_data_list))
-    print("verify_eeprom")
+    result=operator.eq(device_id_list,read_data_list)
+    return result
 
-verify_eeprom(string_device_id)
+result=verify_eeprom(string_device_id)
+print(result)
 
 
 # first_part_data_list,second_part_data_list=list_division_lists(data)   
