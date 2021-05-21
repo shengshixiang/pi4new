@@ -99,6 +99,7 @@ def detect():
                 Led_status=1
                 eeprom_value=barcodeData[-36:]
                 print(eeprom_value)
+                print(type(eeprom_value))
                 break
              
     camera.release()
