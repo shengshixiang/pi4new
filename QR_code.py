@@ -8,7 +8,7 @@ import operator
 import time
 address = 0x50
 bus = smbus2.SMBus(1)
-string_device_id="700ac82b-4366-11eb-a3f8-00163e123ff5"
+string_device_id=""
 def string_division_lists(string):
     device_id_list=list(string)
     first_part_data_list =device_id_list[0:32]
@@ -46,6 +46,9 @@ def verify_eeprom(string_device_id):
        # print('%#x'%data)
     #compare data
     result=operator.eq(device_id_list,read_data_list)
+    
+    print(device_id_list)
+    print(read_data_list) 
     return result
 def decodeDisplay(image):
     barcodeData=""
@@ -227,7 +230,7 @@ def detect():
 if __name__ == '__main__':
     try:
         _thread.start_new_thread(led_control_function, ("Thread-led-control", 0.5, ))
-    except:
+    except:  
         print("Error: 无法启动线程")
         exit
     ret_value=check_eeprom()
@@ -239,32 +242,33 @@ if __name__ == '__main__':
         while True:
             ret, frame = camera.read()
             try:
-                #print("a2a")
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)          
-                #print("aa")
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)                        
             except:
                 camera.release()
                 camera = cv2.VideoCapture(0)
                 time.sleep(1)   
-            else:
-                #print("bb")
+            else:               
                 break
         camera.release()
                #eeprom中没有数据
     #设置led为长灭
     #检测和等待识别出设备
-    device_id_value=detect()
-    print(device_id_value)
-    write_eeprom(device_id_value)
-    time.sleep(0.5)
-    result=verify_eeprom(string_device_id)
-    if(result):
-        print("verify pass")
-        Led_status=3
-    else:
-        print("verify fail")
-   # time.sleep(1)
+    
+    #while  校验成功后退出
+    while True:
+        device_id_value=detect()
+        print(device_id_value)
+        write_eeprom(device_id_value)
+        time.sleep(0.5)
+        result=verify_eeprom(device_id_value)
+        if(result):
+            print("verify pass")
+            Led_status=3
+            break
+        else:
+            print("verify fail")
+       # time.sleep(1)
     input()   
-    #识别成功，设置led为常亮
+        #识别成功，设置led为常亮
    
     
